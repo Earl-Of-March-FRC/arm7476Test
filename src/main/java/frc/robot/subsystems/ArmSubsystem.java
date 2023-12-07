@@ -13,54 +13,55 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.OperatorConstants;
-
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class ArmSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
       //Motors
       final WPI_VictorSPX extensionMotor = OperatorConstants.extension;
       final WPI_TalonSRX rightLift = OperatorConstants.rightLift;
       final WPI_TalonSRX leftLift = OperatorConstants.leftLift;
+      final Encoder encoder = new Encoder(0, 1);
   public ArmSubsystem() {
 
-
-    //Encoders
-    extensionMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
-    extensionMotor.setSelectedSensorPosition(0);
-    extensionMotor.setSensorPhase(true);
-    
-    rightLift.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
-    rightLift.setSelectedSensorPosition(0);
-    rightLift.setSensorPhase(true);
-
-    leftLift.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
-    leftLift.setSelectedSensorPosition(0);
-    leftLift.setSensorPhase(true);
-
+    rightLift.getSelectedSensorPosition(0);
     extensionMotor.setNeutralMode(NeutralMode.Brake);
     rightLift.setNeutralMode(NeutralMode.Brake);
     leftLift.setNeutralMode(NeutralMode.Brake);
   }
 
 
-  public double getPositionExtension(){
-    return extensionMotor.getSelectedSensorPosition();
-  }
-
-  public double getPositionRightLift(){
-    return rightLift.getSelectedSensorPosition();
-  }
-
-  public double getPositionLeftLift(){
-    return leftLift.getSelectedSensorPosition();
-  }
-
   public void setExtensionSpeed(double input){
     extensionMotor.set(input);
   }
 
   public void setLiftSpeed(double input){
-    rightLift.set(input);
     leftLift.set(input);
+    rightLift.set(input);
+  }
+
+  public void setArmMotorSpeed(double inputLift, double inputExtension){
+    // if(encoder.getRaw() >= 50 && inputLift < 0){
+    //   setLiftSpeed(inputLift);
+    //   setExtensionSpeed(inputExtension);
+    // }
+    // else if (encoder.getRaw() >= 50){
+    //   setLiftSpeed(inputLift);
+    //   setExtensionSpeed(inputExtension);
+    // }
+    // else if (encoder.getRaw() >= 20){
+    //   setLiftSpeed(inputLift);
+    //   setExtensionSpeed(inputExtension);
+    // }
+    // else if(encoder.getRaw() <= 5 && inputLift > 0){
+    //   setLiftSpeed(inputLift);
+    // }
+    // else{
+    //   setLiftSpeed(inputLift);
+    // }
+    setLiftSpeed(inputLift);
+    setExtensionSpeed(inputExtension);
+
   }
 
 
@@ -68,6 +69,9 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Enocder ", rightLift.getSelectedSensorPosition());
+
+    
   }
 
   @Override

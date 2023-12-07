@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.ArmSubsystem;
@@ -13,13 +14,13 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ArmCtrlCmd extends CommandBase {
   private ArmSubsystem armSub;
-  private Supplier<Double> extensionSpeed, rightliftSpeed, leftLiftSpeed;
+  private Supplier<Double> extensionSpeed, rightLiftSpeed, leftLiftSpeed;
 
-  public ArmCtrlCmd(ArmSubsystem armSub, Supplier<Double> extensionSpeed, Supplier<Double> rightliftSpeed, Supplier<Double> leftLiftSpeed) {
+  public ArmCtrlCmd(ArmSubsystem armSub, Supplier<Double> extensionSpeed, Supplier<Double> rightLiftSpeed, Supplier<Double> leftLiftSpeed) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.armSub = armSub;
     this.extensionSpeed = extensionSpeed;
-    this.rightliftSpeed = rightliftSpeed;
+    this.rightLiftSpeed = rightLiftSpeed;
     this.leftLiftSpeed = leftLiftSpeed;
     addRequirements(armSub);
   }
@@ -31,8 +32,7 @@ public class ArmCtrlCmd extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    armSub.setExtensionSpeed(extensionSpeed.get());
-    armSub.setLiftSpeed(rightliftSpeed.get());
+    armSub.setArmMotorSpeed(rightLiftSpeed.get(), extensionSpeed.get());
   }
 
   // Called once the command ends or is interrupted.
