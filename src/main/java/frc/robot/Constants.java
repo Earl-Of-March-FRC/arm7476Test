@@ -13,9 +13,10 @@ public class Constants {
         public static final double slewRate = 0.4;
 
         public static class PIDConstants {
-            public static final double rotP = 0.0000001;
+            public static final double rotP = 0.00000001;
             public static final double rotI = 0;
-            public static final double rotD = 0.0000000001;
+            public static final double rotD = 0.00000000001;
+            public static final double rotSetpoint = 0;
             public static final double rotTolerance = 5;
             public static final double rotClamp = 0.3;
         }

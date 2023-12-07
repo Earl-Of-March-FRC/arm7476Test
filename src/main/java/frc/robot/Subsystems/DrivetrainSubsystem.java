@@ -27,7 +27,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private final TalonFXSimCollection backRightSim = new TalonFXSimCollection(backRight);
 
   private final AHRS gyro = new AHRS(Port.kUSB);
-  
 
   private final MecanumDrive drivetrain = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
 

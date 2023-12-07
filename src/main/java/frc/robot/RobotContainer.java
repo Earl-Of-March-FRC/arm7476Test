@@ -36,16 +36,17 @@ public class RobotContainer {
     SmartDashboard.putNumber("Rot P", PIDConstants.rotP);
     SmartDashboard.putNumber("Rot I", PIDConstants.rotI);
     SmartDashboard.putNumber("Rot D", PIDConstants.rotD);
+    SmartDashboard.putNumber("Rot Setpoint", PIDConstants.rotSetpoint);
 
     configureBindings();
   }
 
   private void configureBindings() {
     commandController.a().onTrue(new RotatePIDCmd(driveSub,
-     SmartDashboard.getNumber("Rot P", PIDConstants.rotP),
-     SmartDashboard.getNumber("Rot I", PIDConstants.rotI),
-     SmartDashboard.getNumber("Rot D", PIDConstants.rotD),
-     0
+     () -> SmartDashboard.getNumber("Rot P", PIDConstants.rotP),
+     () -> SmartDashboard.getNumber("Rot I", PIDConstants.rotI),
+     () -> SmartDashboard.getNumber("Rot D", PIDConstants.rotD),
+     () -> SmartDashboard.getNumber("Rot Setpoint", PIDConstants.rotSetpoint)
     ));
   }
 
