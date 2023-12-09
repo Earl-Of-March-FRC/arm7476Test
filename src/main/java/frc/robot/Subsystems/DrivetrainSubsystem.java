@@ -114,7 +114,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return gyro.getAngle();
   }
   public double getGyroPID() {
-    return (getGyroAngle() % 360);
+    return (getGyroAngle() % 360); // Calculating gyro yaw for the PID command
   }
   public void resetGyro() {
     gyro.reset();

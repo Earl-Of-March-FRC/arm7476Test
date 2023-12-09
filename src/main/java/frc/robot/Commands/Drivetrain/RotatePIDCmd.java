@@ -28,8 +28,8 @@ public class RotatePIDCmd extends PIDCommand {
         () -> setpoint.getAsDouble(),
         // This uses the output
         output -> {
-          driveSub.setPermanent(0, 0, MathUtil.clamp(-PIDConstants.rotClamp, PIDConstants.rotClamp, output));
-          SmartDashboard.putNumber("Rot Output", MathUtil.clamp(-PIDConstants.rotClamp, PIDConstants.rotClamp, output));
+          driveSub.setPermanent(0, 0, MathUtil.clamp(output, -PIDConstants.rotClamp, PIDConstants.rotClamp));
+          SmartDashboard.putNumber("Rot Output", MathUtil.clamp(output, -PIDConstants.rotClamp, PIDConstants.rotClamp));
           SmartDashboard.putNumber("Rot Measurement", driveSub.getGyroPID());
           System.out.println("P: " + kP.getAsDouble());
           System.out.println("I: " + kI.getAsDouble());
