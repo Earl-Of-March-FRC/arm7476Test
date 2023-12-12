@@ -20,9 +20,11 @@ public class MecanumDriveCmd extends CommandBase {
   private DoubleSupplier sxFunc, syFunc, rxFunc, scaleFactor;
   private BooleanSupplier limit;
 
-  private final SlewRateLimiter sxFilter = new SlewRateLimiter(DrivetrainConstants.slewRate);
-  private final SlewRateLimiter syFilter = new SlewRateLimiter(DrivetrainConstants.slewRate);
-  private final SlewRateLimiter rxFilter = new SlewRateLimiter(DrivetrainConstants.slewRate);
+  private SlewRateLimiter sxFilter, syFilter, rxFilter;
+
+  // private final SlewRateLimiter sxFilter = new SlewRateLimiter(DrivetrainConstants.slewRate);
+  // private final SlewRateLimiter syFilter = new SlewRateLimiter(DrivetrainConstants.slewRate);
+  // private final SlewRateLimiter rxFilter = new SlewRateLimiter(DrivetrainConstants.slewRate);
 
   /** Creates a new MecanumDriveCmd. */
   public MecanumDriveCmd(
@@ -31,7 +33,8 @@ public class MecanumDriveCmd extends CommandBase {
     DoubleSupplier ySpeed,
     DoubleSupplier xRot,
     DoubleSupplier scaling,
-    BooleanSupplier limit
+    BooleanSupplier limit,
+    SlewRateLimiter sxFilter, SlewRateLimiter syFilter, SlewRateLimiter rxFilter
   ) {
     this.driveSub = driveSub;
     this.sxFunc = xSpeed;
@@ -39,6 +42,9 @@ public class MecanumDriveCmd extends CommandBase {
     this.rxFunc = xRot;
     this.scaleFactor = scaling;
     this.limit = limit;
+    this.sxFilter = sxFilter;
+    this.syFilter = syFilter;
+    this.rxFilter = rxFilter;
 
     addRequirements(driveSub);
   }
@@ -53,16 +59,16 @@ public class MecanumDriveCmd extends CommandBase {
     Double forward, side, rotate, scale;
     scale = MathUtil.applyDeadband(scaleFactor.getAsDouble(), DriverConstants.limitDeadband);
 
-    forward = -(DrivetrainConstants.maxDriveSpeed * (-scale + 1) / 2) * sxFunc.getAsDouble();
+    forward = (DrivetrainConstants.maxDriveSpeed * (-scale + 1) / 2) * sxFunc.getAsDouble();
     side = (DrivetrainConstants.maxDriveSpeed * (-scale + 1) / 2) * syFunc.getAsDouble();
     rotate = (DrivetrainConstants.maxTurnSpeed * (-scale + 1) / 2) * rxFunc.getAsDouble();
 
-    if (limit.getAsBoolean()) {
+    if (limit.getAsBoolean()) { // If limit is true, it will prevent the robot from moving forward/backwards and/or rotate
       forward = 0.0;
       rotate = 0.0;
     }
 
-    driveSub.set(
+    driveSub.driveFieldOriented(
       MathUtil.applyDeadband(sxFilter.calculate(forward), DriverConstants.deadband),
       MathUtil.applyDeadband(syFilter.calculate(side), DriverConstants.deadband),
       MathUtil.applyDeadband(rxFilter.calculate(rotate), DriverConstants.deadband)

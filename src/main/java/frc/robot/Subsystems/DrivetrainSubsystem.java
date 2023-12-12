@@ -27,6 +27,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private final TalonFXSimCollection backRightSim = new TalonFXSimCollection(backRight);
 
   private final AHRS gyro = new AHRS(Port.kUSB);
+  private double fakeGyro = 0;
 
   private final MecanumDrive drivetrain = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
 
@@ -64,11 +65,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("BL Distance", getBackLeftDistance());
     SmartDashboard.putNumber("BR Distance", getBackRightDistance());
 
-    SmartDashboard.putNumber("SX", sX);
-    SmartDashboard.putNumber("SY", sY);
-    SmartDashboard.putNumber("RX", rX);
+    SmartDashboard.putNumber("Mecanum X", sX);
+    SmartDashboard.putNumber("Mecanum Y", sY);
+    SmartDashboard.putNumber("Mecanum RX", rX);
    
     SmartDashboard.putNumber("Gyro Angle", getGyroAngle());
+    SmartDashboard.putNumber("Gyro Angle % 360", getGyroPID());
   }
 
   @Override
@@ -77,14 +79,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
     backLeftSim.addIntegratedSensorPosition((int)(backLeft.get() * 2048 * 0.02));
     frontRightSim.addIntegratedSensorPosition((int)(frontRight.get() * 2048 * 0.02));
     backRightSim.addIntegratedSensorPosition((int)(backRight.get() * 2048 * 0.02));
+    fakeGyro += (rX * 10);
+    SmartDashboard.putNumber("Fake Gyro Angle", fakeGyro);
+    SmartDashboard.putNumber("Fake Gyro Angle Mod", fakeGyro);
   }
 
-  public void setPermanent(double xSpeed, double ySpeed, double xRot) {
+  public void driveRobotOriented(double xSpeed, double ySpeed, double xRot) { // DriveCartesian for routines and PIDs.
     drivetrain.driveCartesian(xSpeed, ySpeed, xRot);
     logMecanum(xSpeed, ySpeed, xRot);
   }
 
-  public void set(double xSpeed, double ySpeed, double xRot) {
+  public void driveFieldOriented(double xSpeed, double ySpeed, double xRot) { // DriveCartesian for the driver.
     //if (!gyroCalibrating()) {
     drivetrain.driveCartesian(xSpeed, ySpeed, xRot, getGyroRot2D().times(-1));
     logMecanum(xSpeed, ySpeed, xRot);
@@ -114,7 +119,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return gyro.getAngle();
   }
   public double getGyroPID() {
-    return (getGyroAngle() % 360); // Calculating gyro yaw for the PID command
+    return (getGyroAngle() % 360); // Calculating gyro modulo 360 for the PID command
+  }
+  public double getFakeGyroPID() {
+    return (fakeGyro % 360);
   }
   public void resetGyro() {
     gyro.reset();

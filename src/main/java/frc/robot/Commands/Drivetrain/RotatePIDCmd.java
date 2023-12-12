@@ -23,12 +23,12 @@ public class RotatePIDCmd extends PIDCommand {
         // The controller that the command will use
         new PIDController(kP.getAsDouble(), kI.getAsDouble(), kD.getAsDouble()),
         // This should return the measurement
-        () -> driveSub.getGyroPID(),
+        () -> driveSub.getFakeGyroPID(),
         // This should return the setpoint (can also be a constant)
         () -> setpoint.getAsDouble(),
         // This uses the output
         output -> {
-          driveSub.setPermanent(0, 0, MathUtil.clamp(output, -PIDConstants.rotClamp, PIDConstants.rotClamp));
+          driveSub.driveRobotOriented(0, 0, MathUtil.clamp(output, -PIDConstants.rotClamp, PIDConstants.rotClamp));
           SmartDashboard.putNumber("Rot Output", MathUtil.clamp(output, -PIDConstants.rotClamp, PIDConstants.rotClamp));
           SmartDashboard.putNumber("Rot Measurement", driveSub.getGyroPID());
           System.out.println("P: " + kP.getAsDouble());

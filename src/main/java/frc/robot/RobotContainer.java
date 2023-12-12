@@ -4,14 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.Drivetrain.MecanumDriveCmd;
 import frc.robot.Commands.Drivetrain.RotatePIDCmd;
+import frc.robot.Commands.Drivetrain.Autos.MoveAndTurn;
 import frc.robot.Constants.DriverConstants;
+import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.DrivetrainConstants.PIDConstants;
 import frc.robot.Subsystems.DrivetrainSubsystem;
 
@@ -20,16 +22,21 @@ public class RobotContainer {
 
   private final XboxController controller = new XboxController(DriverConstants.port);
   private final CommandXboxController commandController = new CommandXboxController(DriverConstants.port);
+
+  private final SlewRateLimiter sxFilter = new SlewRateLimiter(DrivetrainConstants.slewRate);
+  private final SlewRateLimiter syFilter = new SlewRateLimiter(DrivetrainConstants.slewRate);
+  private final SlewRateLimiter rxFilter = new SlewRateLimiter(DrivetrainConstants.slewRate);
   
   public RobotContainer() {
     driveSub.setDefaultCommand(
       new MecanumDriveCmd(
         driveSub,
         () -> controller.getRawAxis(DriverConstants.forwardAxis),
-        () -> controller.getRawAxis(DriverConstants.sideAxis),
-        () -> controller.getRawAxis(DriverConstants.rotAxis),
+        () -> -controller.getRawAxis(DriverConstants.sideAxis),
+        () -> -controller.getRawAxis(DriverConstants.rotAxis),
         () -> controller.getRawAxis(DriverConstants.scalingAxis),
-        () -> controller.getRightBumper()
+        () -> controller.getRightBumper(),
+        sxFilter, syFilter, rxFilter
       )
     );
 
@@ -51,6 +58,12 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return new MoveAndTurn(driveSub,
+    SmartDashboard.getNumber("Rot P", PIDConstants.rotP),
+    SmartDashboard.getNumber("Rot I", PIDConstants.rotI),
+    SmartDashboard.getNumber("Rot D", PIDConstants.rotD),
+    driveSub.getFakeGyroPID(),
+    sxFilter, syFilter, rxFilter
+    );
   }
 }
